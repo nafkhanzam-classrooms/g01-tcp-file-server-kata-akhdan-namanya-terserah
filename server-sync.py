@@ -67,13 +67,34 @@ def start_sync_server(host='127.0.0.1', port=5000):
                     break
 
                 if cmd_data.startswith("/list"):
+                    if not os.path.isdir("storage"):
+                        send_msg(connection, "None")
+                        logging.info(f"Storage directory is not found, attempt to make")
+
+                        os.mkdir("./storage")
+                        continue
+
                     files_str = ", ".join(os.listdir('storage'))
-                    send_msg(connection, files_str)
+
+                    logging.info(f"Files: {files_str}")
+
+                    if len(files_str) <= 0:
+                        send_msg(connection, "Empty")
+                    else:
+                        send_msg(connection, files_str)
 
                 elif cmd_data.startswith("/download"):
                     filename = cmd_data.split()[1]
-                    send_file_chunked(connection, f"storage/{filename}")
 
+                    if not os.path.isfile(f"./storage/{filename}"):
+                        send_msg(connection, "ERR_NOT_FOUND")
+                        logging.info(f"Requested file {filename} is not found.")
+                        send_msg(connection, f"{filename} does not exist.")
+                        continue
+
+                    send_msg(connection, "OK")
+                    logging.info(f"Sending requested file {filename}.")
+                    send_file_chunked(connection, f"storage/{filename}")
                 elif cmd_data.startswith("/upload"):
                     parts = cmd_data.split()
                     if len(parts) > 1:
@@ -85,6 +106,9 @@ def start_sync_server(host='127.0.0.1', port=5000):
 
     except Exception as ee:
         logging.info(f"ERROR: {str(ee)}")
+    except KeyboardInterrupt:
+        server.close()
+        logging.info("closing")
     finally:
         logging.info("closing")
         server.close()
