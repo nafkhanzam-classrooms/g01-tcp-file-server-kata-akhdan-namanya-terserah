@@ -22,16 +22,14 @@ def recv_msg(sock):
 def recv_file_chunked(sock, save_path):
     with open(save_path, "wb") as f:
         while True:
-            # Read the 4-byte length prefix
             header = sock.recv(4)
             if not header: break
             
             length = struct.unpack(">I", header)[0]
             
-            if length == 0: # Sentinel value detected
+            if length == 0:
                 break
                 
-            # Read exactly 'length' bytes for this chunk
             buf = b""
             while len(buf) < length:
                 chunk = sock.recv(length - len(buf))
