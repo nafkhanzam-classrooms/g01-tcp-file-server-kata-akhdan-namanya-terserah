@@ -96,6 +96,9 @@ def start_sync_server(host='127.0.0.1', port=5000):
                     logging.info(f"Sending requested file {filename}.")
                     send_file_chunked(connection, f"storage/{filename}")
                 elif cmd_data.startswith("/upload"):
+                    if not os.path.isdir("storage"):
+                        os.mkdir("./storage")
+
                     parts = cmd_data.split()
                     if len(parts) > 1:
                         filename = parts[1]
