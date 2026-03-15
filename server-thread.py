@@ -125,17 +125,25 @@ class Client(threading.Thread):
             logging.info(f"Client {self.address} uses /list")
 
         elif cmd_data.startswith("/download") and len(parts) > 1:
+            logging.info(f"Client {self.address} uses /download")
             filepath = os.path.join("storage", os.path.basename(parts[1]))
             if os.path.isfile(filepath):
                 self.send_msg("OK")
                 self.send_file_chunked(filepath)
+
+                logging.info(f"Requested file found: {filepath} for client {self.address}")
             else:
                 self.send_msg("Requested file not found")
+                logging.info(f"Requested file not found: {filepath} for client {self.address}")
+
 
         elif cmd_data.startswith("/upload") and len(parts) > 1:
             filepath = os.path.join("storage", os.path.basename(parts[1]))
+
+            logging.info(f"Client {self.address} uses /upload")
             self.recv_file_chunked(filepath)
             self.send_msg("Upload finished")
+            logging.info(f"Client {self.address} uses /upload, uploaded file: {filepath}")
 
     def cleanup(self):
         logging.info(f"Client {self.address} disconnected")
