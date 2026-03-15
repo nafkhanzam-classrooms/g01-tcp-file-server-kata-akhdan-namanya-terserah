@@ -120,7 +120,7 @@ def start_sync_server(host='127.0.0.1', port=5000):
         while True:
             logging.info("waiting for connection")
             connection, client_address = server.accept()
-            logging.info(f"connection from {client_address}")
+            logging.info(f"Client connection from {client_address}")
 
             while True:
                 cmd_data = recv_msg(connection)

@@ -138,7 +138,7 @@ def start_select_server(host='127.0.0.1', port=5000):
                     client_sockets.append(connection)
     
                     logging.info(f"Connected: {client_addr}")
-                    broadcast_message(f"User {client_addr} joined.", connection, client_sockets, server)
+                    broadcast_message(f"Client {client_addr} joined.", connection, client_sockets, server)
                 else:
                     try:
                         cmd_data = recv_msg(s)

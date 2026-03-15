@@ -157,12 +157,25 @@ def handle_upload_chunk(fd, sock, poll_obj):
         if fd in active_uploads:
             del active_uploads[fd]
 
-def cleanup_socket(fd, fd_map, poll_obj):
+def cleanup_socket(fd, fd_map, poll_obj, server):
+    sock = fd_map.get(fd)
+    if not sock:
+        return
+
+    try:
+        addr = sock.getpeername()
+    except:
+        addr = "Unknown"
+
+    logging.info(f"Client {addr} has left.")
+
     if fd in active_downloads: active_downloads[fd].close(); del active_downloads[fd]
     if fd in active_uploads: active_uploads[fd].close(); del active_uploads[fd]
     poll_obj.unregister(fd)
     fd_map[fd].close()
     del fd_map[fd]
+
+    broadcast_message(f"Client {addr} has left.", None, fd_map.values(), server)
 
 def start_poll_server(host='127.0.0.1', port=5000):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -203,14 +216,14 @@ def start_poll_server(host='127.0.0.1', port=5000):
                             else:
                                 raise ConnectionError
                         except:
-                            cleanup_socket(fd, fd_map, poll_obj)
+                            cleanup_socket(fd, fd_map, poll_obj, server)
 
                 elif event & select.POLLOUT:
                     if fd in active_downloads:
                         handle_download_chunk(fd, sock, poll_obj)
 
                 if event & (select.POLLHUP | select.POLLERR):
-                    cleanup_socket(fd, fd_map, poll_obj)
+                    cleanup_socket(fd, fd_map, poll_obj, server)
 
     except Exception as ee:
         logging.info(f"ERROR: {str(ee)}")
