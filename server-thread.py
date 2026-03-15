@@ -1,4 +1,3 @@
-from genericpath import isfile
 import socket, threading
 import os
 import logging
@@ -116,13 +115,12 @@ class Client(threading.Thread):
     def handle_command(self, cmd_data):
         parts = cmd_data.split()
 
-
         if not os.path.isdir("storage"): os.mkdir("storage")
 
         if cmd_data.startswith("/list"):
+            logging.info(f"Client {self.address} uses /list")
             files = os.listdir("storage") if os.path.isdir("storage") else []
             self.send_msg("\n".join(files) if files else "Empty")
-            logging.info(f"Client {self.address} uses /list")
 
         elif cmd_data.startswith("/download") and len(parts) > 1:
             logging.info(f"Client {self.address} uses /download")
@@ -131,13 +129,17 @@ class Client(threading.Thread):
                 self.send_msg("OK")
                 self.send_file_chunked(filepath)
 
-                logging.info(f"Requested file found: {filepath} for client {self.address}")
+                logging.info(f"Requested file found on /download: {filepath} for client {self.address}")
             else:
                 self.send_msg("Requested file not found")
                 logging.info(f"Requested file not found: {filepath} for client {self.address}")
 
 
         elif cmd_data.startswith("/upload") and len(parts) > 1:
+            filename = self.filter_filename(parts[1])
+            if not filename:
+                return
+
             filepath = os.path.join("storage", os.path.basename(parts[1]))
 
             logging.info(f"Client {self.address} uses /upload")
@@ -152,6 +154,14 @@ class Client(threading.Thread):
         with clients_lock:
             if self in all_clients:
                 all_clients.remove(self)
+
+    def filter_filename(self, filename):
+        file = os.path.basename(filename)
+        if file in [".", "..", ""]:
+            logging.info(f"Error when using /upload or /download by {self.address} - invalid filename")
+            self.send_msg("Invalid file name")
+            return None
+        return file
 
 if __name__ == '__main__':
     server = Server()
