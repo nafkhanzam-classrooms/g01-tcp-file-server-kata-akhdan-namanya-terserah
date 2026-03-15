@@ -68,14 +68,12 @@ def handle_command(cmd_data, connection, all_socket, server_socket):
 
         if not filename:
             logging.info(f"Invalid Filename: {raw_filename}")
-            send_msg(connection, f"ERR_INVALID_FILENAME: {raw_filename}")
-            # broadcast_message(f"[BROADCAST] ERR_INVALID_FILENAME: {raw_filename}", connection, all_socket, server_socket)
+            send_msg(connection, f"Invalid file name")
             return
 
         filepath = os.path.join("storage", filename)
 
         if not os.path.isfile(filepath):
-            send_msg(connection, "ERR_NOT_FOUND")
             logging.info(f"Requested file {filename} is not found.")
             send_msg(connection, f"{filename} does not exist.")
             return
@@ -96,7 +94,6 @@ def handle_command(cmd_data, connection, all_socket, server_socket):
             if not filename:
                 logging.info(f"Invalid Filename: {raw_filename}")
                 send_msg(connection, f"ERR_INVALID_FILENAME: {raw_filename}")
-                # broadcast_message(f"[BROADCAST] ERR_INVALID_FILENAME: {raw_filename}", connection, all_socket, server_socket)
                 return
 
             filepath = os.path.join("storage", filename)
