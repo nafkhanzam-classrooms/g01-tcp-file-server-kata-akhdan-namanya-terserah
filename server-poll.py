@@ -90,7 +90,7 @@ def handle_command(cmd_data, sock, poll_obj):
                 return
 
             filepath = os.path.join("storage", filename)
-            active_uploads[fd] = open(filepath, "rb")
+            active_uploads[fd] = open(filepath, "wb")
 
 def broadcast_message(message, sender_socket, all_socket, server_socket):
     for sock in all_socket:

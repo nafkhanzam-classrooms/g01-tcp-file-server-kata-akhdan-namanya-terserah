@@ -86,7 +86,7 @@ class Client(threading.Thread):
         self.client.sendall(struct.pack(">I", 0))
 
     def recv_file_chunked(self, save_path):
-        with open(save_path, "rb") as f:
+        with open(save_path, "wb") as f:
             while True:
                 header = self.client.recv(4)
                 if not header: break
