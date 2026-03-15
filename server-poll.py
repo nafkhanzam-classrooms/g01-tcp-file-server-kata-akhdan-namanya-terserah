@@ -52,7 +52,6 @@ def send_file_chunked(sock, path):
 def handle_command(cmd_data, sock, poll_obj):
     fd = sock.fileno()
 
-
     if not os.path.isdir("storage"):
         os.mkdir("./storage")
 
@@ -72,7 +71,7 @@ def handle_command(cmd_data, sock, poll_obj):
         filepath = os.path.join("storage", filename)
 
         if not os.path.isfile(filepath):
-            logging.info(f"Requested file not found: {filename} for clinet {sock.getpeername()}")
+            logging.info(f"Requested file not found: {filename} for client {sock.getpeername()}")
             send_msg(sock, "Requested file not found")
             return
 
@@ -189,7 +188,7 @@ def start_poll_server(host='127.0.0.1', port=5000):
                     fd_map[conn.fileno()] = conn
                     poll_obj.register(conn.fileno(), select.POLLIN)
                     logging.info(f"Client connected: {addr}")
-                    broadcast_message(f"Client {addr} joined.", conn, fd_map.values(), server)
+                    broadcast_message(f"Client connected: {addr}", conn, fd_map.values(), server)
 
                     continue
 

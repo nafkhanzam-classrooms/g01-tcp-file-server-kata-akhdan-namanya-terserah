@@ -1,2 +1,6 @@
-storage/
-test_client.py
+storage/*
+*
+
+!.gitignore
+!README.md
+!server-*
