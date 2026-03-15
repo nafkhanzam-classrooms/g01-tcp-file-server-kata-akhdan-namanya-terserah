@@ -230,9 +230,6 @@ def start_poll_server(host='127.0.0.1', port=5000):
     except KeyboardInterrupt:
         server.close()
         logging.info("closing")
-    finally:
-        logging.info("closing")
-        server.close()
 
 if __name__ == '__main__':
     start_poll_server()
