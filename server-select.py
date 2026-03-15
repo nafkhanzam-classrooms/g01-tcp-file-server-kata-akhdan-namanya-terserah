@@ -72,8 +72,8 @@ def handle_command(cmd_data, connection, all_socket, server_socket):
             return
 
         send_msg(connection, "OK")
-        logging.info(f"Sending requested file {filename}.")
         send_file_chunked(connection, f"storage/{filename}")
+        logging.info(f"Requested file found on /download: {filename} for client {connection.getpeername()}")
 
     elif cmd_data.startswith("/upload"):
         logging.info(f"Client {connection.getpeername()} uses /upload")
