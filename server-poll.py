@@ -77,6 +77,8 @@ def handle_command(cmd_data, sock, poll_obj):
 
         send_msg(sock, "OK")
         active_downloads[fd] = open(filepath, "rb")
+        logging.info(f"Requested file found on /download: {filename} for client {sock.getpeername()}")
+
         poll_obj.modify(fd, select.POLLIN | select.POLLOUT)
 
     elif cmd_data.startswith("/upload"):
@@ -91,6 +93,8 @@ def handle_command(cmd_data, sock, poll_obj):
 
             filepath = os.path.join("storage", filename)
             active_uploads[fd] = open(filepath, "wb")
+
+            logging.info(f"Client {sock.getpeername()} uses /upload, uploaded file: {filename}")
 
 def broadcast_message(message, sender_socket, all_socket, server_socket):
     for sock in all_socket:
@@ -111,14 +115,15 @@ def filter_filename(filename, sock):
 def handle_download_chunk(fd, sock, poll_obj):
     f = active_downloads[fd]
     chunk = f.read(8192)
+
     if chunk:
         sock.sendall(struct.pack(">I", len(chunk)) + chunk)
     else:
         sock.sendall(struct.pack(">I", 0))
         f.close()
+
         del active_downloads[fd]
         poll_obj.modify(fd, select.POLLIN)
-        logging.info(f"Requested file found on /download: {None} for client {sock.getpeername()}")
 
 def handle_upload_chunk(fd, sock, poll_obj):
     f = active_uploads[fd]
@@ -132,13 +137,13 @@ def handle_upload_chunk(fd, sock, poll_obj):
             f.close()
             del active_uploads[fd]
             send_msg(sock, "Upload finished.")
-            logging.info(f"Client {sock.getpeername()} uses /upload, uploaded file: {None}")
         else:
             buf = b""
             while len(buf) < length:
                 chunk = sock.recv(length - len(buf))
                 buf += chunk
             f.write(buf)
+
     except:
         f.close()
         if fd in active_uploads:
