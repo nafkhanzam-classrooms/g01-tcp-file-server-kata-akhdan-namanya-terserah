@@ -3,6 +3,8 @@ import os
 import logging
 import struct
 
+from test_client import send_msg
+
 logging.basicConfig(level=logging.INFO)
 
 all_clients = []
@@ -20,7 +22,8 @@ class Server:
         self.server.bind((self.host, self.port))
         self.server.listen(5)
 
-        logging.info(f"Threaded Server running at {self.host} on port {self.port}")
+        logging.info(f"Server is listening at address {self.host} on port {self.port}")
+        logging.info("waiting for connection")
 
     def run(self):
         self.open_socket()
@@ -35,9 +38,19 @@ class Server:
                 c.start()
 
                 logging.info(f"Client connected {client_addr}")
+
+                c.send_msg("CONNECTED")
                 self.broadcast(f"Client connected: {client_addr}", c)
+
         except KeyboardInterrupt:
             logging.info("Server shutting down")
+            with clients_lock:
+                for c in all_clients:
+                    try:
+                        c.client.shutdown(socket.SHUT_RDWR)
+                        c.client.close()
+                    except:
+                        pass
         finally:
             self.server.close()
 

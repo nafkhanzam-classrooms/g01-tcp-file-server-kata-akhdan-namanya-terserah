@@ -115,6 +115,7 @@ def start_select_server(host='127.0.0.1', port=5000):
     server.setblocking(False)
 
     logging.info(f"Server is listening at address {host} on port {port}")
+    logging.info("waiting for connection")
 
     client_sockets = [server]
 
@@ -129,6 +130,8 @@ def start_select_server(host='127.0.0.1', port=5000):
                     client_sockets.append(connection)
     
                     logging.info(f"Client connected: {client_addr}")
+
+                    send_msg(connection, "CONNECTED")
                     broadcast_message(f"Client connected: {client_addr} joined.", connection, client_sockets, server)
                 else:
                     try:

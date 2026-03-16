@@ -176,6 +176,7 @@ def start_poll_server(host='127.0.0.1', port=5000):
 
     fd_map = {server.fileno(): server}
     logging.info(f"Server is listening at address {host} on port {port}")
+    logging.info("waiting for connection")
 
     try:
         while True:
@@ -188,6 +189,8 @@ def start_poll_server(host='127.0.0.1', port=5000):
                     fd_map[conn.fileno()] = conn
                     poll_obj.register(conn.fileno(), select.POLLIN)
                     logging.info(f"Client connected: {addr}")
+
+                    send_msg(conn, "CONNECTED")
                     broadcast_message(f"Client connected: {addr}", conn, fd_map.values(), server)
 
                     continue
