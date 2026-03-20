@@ -1,0 +1,7 @@
+storage/*
+*
+
+!.gitignore
+!README.md
+!server-*
+!client*
