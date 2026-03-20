@@ -16,3 +16,5 @@ Link ditaruh di bawah ini
 ## Penjelasan Program
 
 ## Screenshot Hasil
+
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/0ac45ad8-1783-44dc-9609-a693de21f3be" />
