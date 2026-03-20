@@ -15,7 +15,7 @@ Link ditaruh di bawah ini
 
 ## Penjelasan Program
 
-## 1. Fungsi Komunikasi Inti (Sama pada Semua Server)
+# 1. Fungsi Komunikasi Inti (Sama pada Semua Server)
 
 Sebelum membahas perbedaan arsitekturnya, semua server (dan juga *client*) berbagi fungsi dasar yang sama untuk berinteraksi:
 
@@ -25,7 +25,7 @@ Sebelum membahas perbedaan arsitekturnya, semua server (dan juga *client*) berba
 
 ---
 
-## 2. Arsitektur Penanganan Client (Perbedaan Keempat Server)
+# 2. Arsitektur Penanganan Client (Perbedaan Keempat Server)
 
 ### A. `server-sync.py` (Synchronous / Blocking)
 Ini adalah bentuk server yang paling dasar dan sederhana.
@@ -53,7 +53,7 @@ Ini adalah versi yang lebih modern dan skalabel dari `server-select.py`.
 
 ---
 
-## 3. Penjelasan `client.py`
+# 3. Penjelasan `client.py`
 
 File ini adalah antarmuka interaktif yang menghubungkan pengguna dengan server mana pun yang sedang dijalankan.
 
