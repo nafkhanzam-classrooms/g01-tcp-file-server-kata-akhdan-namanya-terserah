@@ -28,7 +28,7 @@ class Server:
         try:
             while True:
                 client_sock, client_addr = self.server.accept()
-                c = Client(client_sock, client_addr)
+                c = Client(client_sock, client_addr, self)
 
                 with clients_lock:
                     all_clients.append(c)
@@ -63,11 +63,12 @@ class Server:
 
 
 class Client(threading.Thread):
-    def __init__(self, client, address):
+    def __init__(self, client, address, server_instance):
         threading.Thread.__init__(self)
         self.client = client
         self.address = address
         self.size = 8192
+        self.server = server_instance
         self.running = True
 
     def send_msg(self, data_str):
@@ -160,11 +161,14 @@ class Client(threading.Thread):
 
     def cleanup(self):
         logging.info(f"Client {self.address} disconnected")
+
         self.client.close()
         self.running = False
         with clients_lock:
             if self in all_clients:
                 all_clients.remove(self)
+
+        self.server.broadcast(f"Client {self.address} has left.")
 
     def filter_filename(self, filename):
         file = os.path.basename(filename)
@@ -173,6 +177,7 @@ class Client(threading.Thread):
             self.send_msg("Invalid file name")
             return None
         return file
+
 
 if __name__ == '__main__':
     server = Server()
