@@ -1,6 +1,8 @@
 import socket
 import struct
 import os
+import select
+import sys
 
 def send_msg(sock, data_str):
     data = data_str.encode()
@@ -51,46 +53,60 @@ def start_client(host='localhost', port=5000):
         print("--- File Transfer---\n")
         print("Commands: /list, /upload <filepath>, /download <filename>, /exit\n")
         while True:
-            cmd = input("client> ")
-            if not cmd.strip(): 
-                continue
-            if cmd in ["/quit", "/exit"]:
-                print("Disconnecting...")
-                break
-            parts = cmd.split()
-            command = parts[0]
-            if command == "/list":
-                send_msg(client, cmd)
-                response = recv_msg(client)
-                print(f"\nFiles on server:\n{response}\n")
-            elif command == "/download" and len(parts) > 1:
-                filename = parts[1]
-                send_msg(client, cmd)
-                response = recv_msg(client)
-                if response == "OK":
-                    save_path = os.path.join("client_storage", os.path.basename(filename))
-                    print(f"Downloading {filename}...")
-                    recv_file_chunked(client, save_path)
-                    print(f"Success! Saved to {save_path}\n")
-                else:
-                    print(f"Server: {response}\n")
-            elif command == "/upload" and len(parts) > 1:
-                filepath = parts[1]
-                if not os.path.isfile(filepath):
-                    print(f"Local file not found: {filepath}\n")
-                    continue
-                send_msg(client, cmd)
-                print(f"Uploading {filepath}...")
-                send_file_chunked(client, filepath)
-                response = recv_msg(client)
-                print(f"Server: {response}\n")
-            else:
-                print("Invalid command syntax.")
-                print("Usage: /list | /upload <path> | /download <name>\n")
+            sys.stdout.write("client> ")
+            sys.stdout.flush()
+            read_sockets, _, _ = select.select([client, sys.stdin], [], [])
+            for notified_socket in read_sockets:
+                if notified_socket == client:
+                    message = recv_msg(client)
+                    if not message:
+                        print("\nDisconnected from server.")
+                        return
+                    print(f"\r{message}          ")
+                elif notified_socket == sys.stdin:
+                    cmd = sys.stdin.readline()
+                    if not cmd:
+                        continue
+                    cmd = cmd.strip()
+                    if not cmd: 
+                        continue
+                    if cmd in ["/quit", "/exit"]:
+                        print("Disconnecting...")
+                        return
+                    parts = cmd.split()
+                    command = parts[0]
+                    if command == "/list":
+                        send_msg(client, cmd)
+                        response = recv_msg(client)
+                        print(f"Files on server:\n{response}\n")
+                    elif command == "/download" and len(parts) > 1:
+                        filename = parts[1]
+                        send_msg(client, cmd)
+                        response = recv_msg(client)
+                        if response == "OK":
+                            save_path = os.path.join("client_storage", os.path.basename(filename))
+                            print(f"Downloading {filename}...")
+                            recv_file_chunked(client, save_path)
+                            print(f"Success! Saved to {save_path}\n")
+                        else:
+                            print(f"Server: {response}\n")
+                    elif command == "/upload" and len(parts) > 1:
+                        filepath = parts[1]
+                        if not os.path.isfile(filepath):
+                            print(f"Local file not found: {filepath}\n")
+                            continue
+                        send_msg(client, cmd)
+                        print(f"Uploading {filepath}...")
+                        send_file_chunked(client, filepath)
+                        response = recv_msg(client)
+                        print(f"Server: {response}\n")
+                    else:
+                        print("Invalid command syntax.")
+                        print("Usage: /list | /upload <path> | /download <name>\n")
     except ConnectionRefusedError:
         print(f"Could not connect to server at {host}:{port}. Is it running?")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"\nAn error occurred: {e}")
     finally:
         client.close()
 if __name__ == "__main__":
