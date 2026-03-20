@@ -3,8 +3,6 @@ import os
 import logging
 import struct
 
-from test_client import send_msg
-
 logging.basicConfig(level=logging.INFO)
 
 all_clients = []

@@ -112,7 +112,6 @@ def start_select_server(host='127.0.0.1', port=5000):
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     server.bind((host, port))
     server.listen(5)
-    server.setblocking(False)
 
     logging.info(f"Server is listening at address {host} on port {port}")
     logging.info("waiting for connection")
