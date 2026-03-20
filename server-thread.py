@@ -168,7 +168,7 @@ class Client(threading.Thread):
             if self in all_clients:
                 all_clients.remove(self)
 
-        self.server.broadcast(f"Client {self.address} has left.")
+        self.server.broadcast(f"Client {self.address} has left.", self.server)
 
     def filter_filename(self, filename):
         file = os.path.basename(filename)
