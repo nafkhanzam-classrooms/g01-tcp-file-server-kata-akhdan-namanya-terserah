@@ -1,7 +1,9 @@
 storage/*
+client_storage/*
+client_storage/
 *
 
 !.gitignore
 !README.md
 !server-*
-!client*
+!client.*

@@ -4,8 +4,8 @@
 ## Anggota Kelompok
 | Nama           | NRP        | Kelas     |
 | ---            | ---        | ----------|
-|                |            |           |
-|                |            |           |
+| Ahmad Satrio Arrohman | 5025241061 | Pemrograman Jaringan - D |
+| Muhammad Akhdan Alwaafy | 5025241223 | Pemrograman Jaringan - D |
 
 ## Link Youtube (Unlisted)
 Link ditaruh di bawah ini
